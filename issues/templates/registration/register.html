@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - CivicEye</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min. + css" rel="stylesheet">
+    <style>
+        /* ফর্মের ইনপুটগুলোকে সুন্দর করার জন্য ছোট একটি সিএসএস */
+        input {
+            display: block;
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #212529;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            margin-bottom: 10px;
+        }
+        ul { font-size: 12px; color: #6c757d; } /* পাসওয়ার্ডের নিয়মগুলো ছোট দেখাবে */
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-warning text-center fw-bold">
+                        Create New Account
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-warning w-100 fw-bold mt-3">Sign Up</button>
+                        </form>
+                        <hr>
+                        <p class="text-center mb-0 small">ইতিমধ্যেই একাউন্ট আছে? <a href="{% url 'login' %}" class="text-decoration-none">লগইন করুন</a></p>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="/" class="text-muted text-decoration-none small">← ফিরে যান হোমপেজে</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

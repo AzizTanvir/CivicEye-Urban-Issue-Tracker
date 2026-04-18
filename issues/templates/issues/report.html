@@ -1,0 +1,27 @@
+{% extends 'issues/base.html' %}
+
+{% block title %}Report an Issue - CivicEye{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white text-center fw-bold">
+                নতুন অভিযোগ রিপোর্ট করুন
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <!-- জ্যাঙ্গো ফর্ম লোড হচ্ছে -->
+                    {{ form.as_p }}
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success w-100 fw-bold">সাবমিট করুন</button>
+                        <a href="/" class="btn btn-secondary w-100 mt-2">ফিরে যান</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
