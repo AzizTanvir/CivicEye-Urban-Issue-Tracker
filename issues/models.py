@@ -1,31 +1,44 @@
 from django.db import models
 from django.contrib.auth.models import User
-# Create your models here.
 
-from django.db import models
-
+# Model to store reported urban issues with geospatial data
 class Incident(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    # Category options for the reported issues
     CATEGORY_CHOICES = [
-        ('Road', 'রাস্তা বা গর্ত'),
-        ('Waste', 'ময়লা-আবর্জনা'),
-        ('Electricity', 'বিদ্যুৎ বা ল্যাম্পপোস্ট'),
-        ('Water', 'পানি বা ড্রেনেজ'),
+        ('Road or Hole', 'Road or Hole'),
+        ('Waste or Garbage', 'Waste or Garbage'),
+        ('Electricity', 'Electricity'),
+        ('Water', 'Water'),
     ]
     
+    # Severity levels to prioritize the issues
     SEVERITY_CHOICES = [
-        ('Low', 'কম গুরুত্ব'),
-        ('Medium', 'মাঝারি'),
-        ('High', 'অত্যধিক জরুরি'),
+        ('Low', 'Low'),
+        ('Medium', 'Medium'),
+        ('High', 'High'),
     ]
 
+    # Status tracking for administrative actions
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('In Progress', 'In Progress'),
+        ('Solved', 'Solved'),
+    ]
+
+    # Relationships and Fields
+    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=200)
     description = models.TextField()
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
-    location = models.CharField(max_length=255) 
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    location = models.CharField(max_length=255) # General area description
+    
+    # Geospatial data for precise mapping
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    
     image = models.ImageField(upload_to='incidents/')
     severity = models.CharField(max_length=10, choices=SEVERITY_CHOICES, default='Medium')
-    status = models.CharField(max_length=20, default='Pending') 
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending') 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

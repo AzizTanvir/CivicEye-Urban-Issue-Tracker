@@ -10,23 +10,23 @@
     <nav class="navbar navbar-dark bg-dark shadow mb-4">
         <div class="container">
             <a class="navbar-brand fw-bold" href="/">CivicEye Dashboard</a>
-            <a href="/" class="btn btn-outline-light btn-sm">ফিরে যান</a>
+            <a href="/" class="btn btn-outline-light btn-sm">Go Back</a>
         </div>
     </nav>
 
     <div class="container">
         <div class="card shadow-sm p-4 border-0">
-            <h3 class="mb-4 text-center">আমার করা রিপোর্টসমূহ</h3>
+            <h3 class="mb-4 text-center">My Reports</h3>
             
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>ছবি</th>
-                            <th>শিরোনাম</th>
-                            <th>ক্যাটাগরি</th>
-                            <th>স্ট্যাটাস</th>
-                            <th>অ্যাকশন</th>
+                            <th>Image</th>
+                            <th>Headline...</th>
+                            <th>Category</th>
+                            <th>Sataus</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,17 +44,17 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="{% url 'issue_detail' report.pk %}" class="btn btn-sm btn-info text-white">দেখুন</a>
-                                    <form action="{% url 'delete_report' report.pk %}" method="POST" onsubmit="return confirm('ডিলিট করতে চান?')">
+                                    <a href="{% url 'issue_detail' report.pk %}" class="btn btn-sm btn-info text-white">Watch</a>
+                                    <form action="{% url 'delete_report' report.pk %}" method="POST" onsubmit="return confirm('Are you sure?')">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-danger">ডিলিট</button>
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center py-4 text-muted">আপনি এখনো কোনো রিপোর্ট করেননি।</td>
+                            <td colspan="5" class="text-center py-4 text-muted">You haven't reported any issues yet.</td>
                         </tr>
                         {% endfor %}
                     </tbody>

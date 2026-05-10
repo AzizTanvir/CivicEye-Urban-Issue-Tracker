@@ -11,12 +11,12 @@ urlpatterns = [
     path('report/', views.report_issue, name='report_issue'),
     path('issue/<int:pk>/', views.issue_detail, name='issue_detail'),
     
-    # "আমার রিপোর্ট" এবং "ডিলিট" এর জন্য নতুন পাথ
+    # New Path for "My Report" and Delete 
     path('my-reports/', views.my_reports, name='my_reports'),
     path('delete/<int:pk>/', views.delete_report, name='delete_report'),
     path('update-status/<int:pk>/', views.update_status, name='update_status'),
     
-    # একাউন্ট সিস্টেম
+    # Account System
     path('register/', views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),

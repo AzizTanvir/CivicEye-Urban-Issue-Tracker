@@ -3,25 +3,120 @@
 {% block title %}Report an Issue - CivicEye{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
+<div class="row justify-content-center pb-5">
+    <div class="col-md-8">
         <div class="card shadow border-0">
             <div class="card-header bg-primary text-white text-center fw-bold">
-                নতুন অভিযোগ রিপোর্ট করুন
+                Report New Incident
             </div>
             <div class="card-body p-4">
+                
+                <!-- Instruction and Status -->
+                <div class="mb-3 text-center">
+                    <p class="small text-muted mb-2">
+                        Use the <b>Search Box</b> on the map or click directly to pinpoint the exact location.
+                    </p>
+                    <p id="location-status" class="small fw-bold mb-0">Detecting location...</p>
+                </div>
+
+                <!-- Satellite Map Container -->
+                <div id="pickMap" class="mb-4 shadow-sm border" style="height: 400px; border-radius: 10px; z-index: 1;"></div>
+
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <!-- জ্যাঙ্গো ফর্ম লোড হচ্ছে -->
-                    {{ form.as_p }}
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ form.as_p }}
+                        </div>
+                    </div>
                     
                     <div class="mt-4">
-                        <button type="submit" class="btn btn-success w-100 fw-bold">সাবমিট করুন</button>
-                        <a href="/" class="btn btn-secondary w-100 mt-2">ফিরে যান</a>
+                        <button type="submit" class="btn btn-success w-100 fw-bold py-2">Submit Report</button>
+                        <a href="/" class="btn btn-secondary w-100 mt-2">Go Back</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 1. Initialize Satellite Map
+    var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri'
+    });
+
+    var map = L.map('pickMap', {
+        center: [23.8103, 90.4125], // Default Dhaka
+        zoom: 13,
+        layers: [satelliteLayer]
+    });
+
+    var marker = L.marker([23.8103, 90.4125], { draggable: true }).addTo(map);
+
+    // Sync Lat/Lng with Django Form fields
+    function updateCoordinates(lat, lng) {
+        document.getElementById('id_latitude').value = lat.toFixed(8);
+        document.getElementById('id_longitude').value = lng.toFixed(8);
+    }
+
+    // 2. Add Search Control (Geocoder)
+    var geocoder = L.Control.geocoder({
+        defaultMarkGeocode: false,
+        placeholder: "Search for area..."
+    })
+    .on('markgeocode', function(e) {
+        var center = e.geocode.center;
+        map.setView(center, 18); // Zoom in close to searched location
+        marker.setLatLng(center);
+        updateCoordinates(center.lat, center.lng);
+        document.getElementById('location-status').textContent = "Location found via search.";
+        document.getElementById('location-status').style.color = "green";
+    })
+    .addTo(map);
+
+    // 3. Automatic GPS Locating
+    function autoLocate() {
+        const status = document.getElementById('location-status');
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const accuracy = position.coords.accuracy;
+
+                map.setView([lat, lng], 18);
+                marker.setLatLng([lat, lng]);
+                updateCoordinates(lat, lng);
+
+                status.textContent = "GPS Active (Accuracy: within " + Math.round(accuracy) + " meters)";
+                status.style.color = (accuracy < 100) ? "green" : "orange";
+            }, (error) => {
+                status.textContent = "GPS search failed. Please use the search bar or click the map.";
+                status.style.color = "red";
+            }, { enableHighAccuracy: true });
+        }
+    }
+
+    window.onload = autoLocate;
+
+    // 4. Manual Interaction: Click on Map
+    map.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        updateCoordinates(e.latlng.lat, e.latlng.lng);
+        document.getElementById('location-status').textContent = "Manual position picked.";
+        document.getElementById('location-status').style.color = "blue";
+    });
+
+    // 5. Manual Interaction: Drag Marker
+    marker.on('dragend', function(e) {
+        var lat = marker.getLatLng().lat;
+        var lng = marker.getLatLng().lng;
+        updateCoordinates(lat, lng);
+        document.getElementById('location-status').textContent = "Marker adjusted manually.";
+    });
+</script>
 {% endblock %}

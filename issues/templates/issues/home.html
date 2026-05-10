@@ -1,21 +1,23 @@
 {% extends 'issues/base.html' %}
 
-{% block title %}CivicEye - Dashboard{% endblock %}
+{% block title %}Dashboard | CivicEye{% endblock %}
 
 {% block content %}
-<!-- Dashboard Section (Charts) -->
+<!-- Analytics Section -->
 <div class="row mb-4">
+    <!-- Category Chart -->
     <div class="col-md-6 mb-3">
-        <div class="card shadow-sm p-3">
-            <h5 class="text-center">সমস্যার ধরণ (Analytics)</h5>
+        <div class="card shadow-sm h-100 p-3">
+            <h5 class="text-center fw-bold text-secondary mb-3">Issue Distribution by Category</h5>
             <div class="chart-container">
                 <canvas id="categoryChart"></canvas>
             </div>
         </div>
     </div>
+    <!-- Severity Chart -->
     <div class="col-md-6 mb-3">
-        <div class="card shadow-sm p-3">
-            <h5 class="text-center">জরুরি অবস্থা (Severity)</h5>
+        <div class="card shadow-sm h-100 p-3">
+            <h5 class="text-center fw-bold text-secondary mb-3">Priority Breakdown</h5>
             <div class="chart-container">
                 <canvas id="severityChart"></canvas>
             </div>
@@ -23,63 +25,80 @@
     </div>
 </div>
 
-<!-- Map Section -->
+<!-- Interactive Map Section -->
 <div class="card shadow-sm mb-5 p-3">
-    <h5 class="text-center mb-3">লাইভ ইস্যু ম্যাপ (Issue Map)</h5>
+    <h5 class="text-center fw-bold text-secondary mb-3">Live Geographic Tracker (Switch to Satellite for Precision)</h5>
     <div id="mainMap"></div>
 </div>
 
-<!-- Search & Filter Section -->
-<div class="card p-3 mb-4 shadow-sm border-0">
-    <form method="GET" class="row g-2">
-        <div class="col-md-6">
-            <input type="text" name="q" class="form-control" placeholder="শিরোনাম দিয়ে খুঁজুন..." value="{{ request.GET.q }}">
+<!-- Search & Filter Bar -->
+<div class="card p-4 mb-5 shadow-sm border-0 bg-white">
+    <form method="GET" class="row g-3 align-items-center">
+        <div class="col-md-5">
+            <label class="small fw-bold text-muted">Search Keywords</label>
+            <input type="text" name="q" class="form-control" placeholder="Search by title..." value="{{ request.GET.q }}">
         </div>
         <div class="col-md-4">
+            <label class="small fw-bold text-muted">Filter by Category</label>
             <select name="category" class="form-select">
-                <option value="">সব ক্যাটাগরি</option>
-                <option value="Road">রাস্তা বা গর্ত</option>
-                <option value="Waste">ময়লা-আবর্জনা</option>
-                <option value="Electricity">বিদ্যুৎ</option>
-                <option value="Water">পানি</option>
+                <option value="">All Categories</option>
+                <option value="Road or Hole">Road or Hole</option>
+                <option value="Waste or Garbage">Waste or Garbage</option>
+                <option value="Electricity">Electricity</option>
+                <option value="Water">Water</option>
             </select>
         </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">Search</button>
+        <div class="col-md-3 mt-md-4 pt-md-2">
+            <button type="submit" class="btn btn-primary w-100 fw-bold">Apply Filter</button>
         </div>
     </form>
 </div>
 
-<!-- Incidents List -->
+<!-- Incident Feed Section -->
+<h4 class="fw-bold text-dark mb-4">Recent Incident Feed</h4>
 <div class="row">
     {% for incident in incidents %}
     <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm border-0">
+        <div class="card h-100 shadow-sm border-0 overflow-hidden">
+            <!-- Incident Image -->
             {% if incident.image %}
             <a href="{% url 'issue_detail' incident.pk %}">
-                <img src="{{ incident.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                <img src="{{ incident.image.url }}" class="card-img-top" style="height: 220px; object-fit: cover;" alt="{{ incident.title }}">
             </a>
             {% endif %}
+            
             <div class="card-body">
-                <span class="badge bg-dark mb-2">{{ incident.category }}</span>
-                <h5 class="card-title">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="badge bg-dark small">{{ incident.category }}</span>
+                    <span class="text-primary fw-bold small">{{ incident.status }}</span>
+                </div>
+                
+                <h5 class="card-title fw-bold">
                     <a href="{% url 'issue_detail' incident.pk %}" class="text-decoration-none text-dark">
                         {{ incident.title }}
                     </a>
                 </h5>
-                <p class="text-muted small">{{ incident.description|truncatewords:10 }}</p>
-                <div class="d-flex justify-content-between">
+                <p class="text-muted small mb-3">{{ incident.description|truncatewords:12 }}</p>
+                
+                <div class="d-flex justify-content-between align-items-center">
                     <span class="badge {% if incident.severity == 'High' %}bg-danger{% elif incident.severity == 'Medium' %}bg-warning text-dark{% else %}bg-success{% endif %}">
-                        {{ incident.severity }}
+                        {{ incident.severity }} Severity
                     </span>
-                    <span class="text-primary fw-bold small">{{ incident.status }}</span>
+                    <small class="text-muted"><i class="bi bi-calendar"></i> {{ incident.created_at|date:"M d, Y" }}</small>
                 </div>
             </div>
+            
             {% if incident.author %}
-            <div class="card-footer bg-white border-0 small text-muted pt-0">
-                রিপোর্ট করেছেন: <b>{{ incident.author.username }}</b>
+            <div class="card-footer bg-light border-0 py-2 small text-muted">
+                Reported by: <span class="fw-bold">{{ incident.author.username }}</span>
             </div>
             {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <div class="alert alert-secondary border-0 shadow-sm">
+            No incident reports found matching your criteria.
         </div>
     </div>
     {% endfor %}
@@ -88,7 +107,7 @@
 
 {% block extra_js %}
 <script>
-    // Charts Logic
+    // 1. Chart.js Implementation
     const ctx1 = document.getElementById('categoryChart').getContext('2d');
     new Chart(ctx1, {
         type: 'pie',
@@ -96,7 +115,7 @@
             labels: [{% for s in stats %}'{{ s.category }}',{% endfor %}],
             datasets: [{
                 data: [{% for s in stats %}{{ s.total }},{% endfor %}],
-                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0']
+                backgroundColor: ['#3498db', '#e67e22', '#f1c40f', '#1abc9c', '#9b59b6']
             }]
         },
         options: { responsive: true, maintainAspectRatio: false }
@@ -108,25 +127,51 @@
         data: {
             labels: [{% for s in severity_stats %}'{{ s.severity }}',{% endfor %}],
             datasets: [{
-                label: 'রিপোর্ট সংখ্যা',
+                label: 'Total Reports',
                 data: [{% for s in severity_stats %}{{ s.total }},{% endfor %}],
-                backgroundColor: '#6c757d'
+                backgroundColor: '#34495e'
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
     });
 
-    // Map Logic
-    var map = L.map('mainMap').setView([23.8103, 90.4125], 12);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '© OpenStreetMap contributors © CARTO'
-    }).addTo(map);
+    // 2. Leaflet Map Implementation (Real GPS Coordinates)
+    var streetMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '© CARTO'
+    });
 
+    var satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles © Esri'
+    });
+
+    var map = L.map('mainMap', {
+        center: [23.8103, 90.4125], // Default Dhaka center
+        zoom: 12,
+        layers: [streetMap]
+    });
+
+    var baseMaps = {
+        "Modern Street": streetMap,
+        "Satellite Imagery": satelliteMap
+    };
+    L.control.layers(baseMaps).addTo(map);
+
+    // Dynamic Markers from Database
     {% for incident in incidents %}
-        var lat = 23.75 + (Math.random() * 0.1); 
-        var lng = 90.35 + (Math.random() * 0.1);
-        L.marker([lat, lng]).addTo(map)
-            .bindPopup("<b>{{ incident.title }}</b><br><a href='{% url 'issue_detail' incident.pk %}'>View Details</a>");
+        {% if incident.latitude and incident.longitude %}
+            L.marker([{{ incident.latitude }}, {{ incident.longitude }}]).addTo(map)
+                .bindPopup(`
+                    <div style="width: 150px">
+                        <strong style="color: #2c3e50">{{ incident.title }}</strong><br>
+                        <small class="text-muted">{{ incident.category }}</small><br>
+                        <a href="{% url 'issue_detail' incident.pk %}" class="btn btn-primary btn-sm text-white mt-2" style="font-size: 10px; width: 100%">View Details</a>
+                    </div>
+                `);
+        {% endif %}
     {% endfor %}
 </script>
 {% endblock %}

@@ -2,12 +2,12 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-5 card p-4 shadow">
-            <h4 class="text-danger">রিপোর্টটি ডিলিট করতে চান?</h4>
-            <p>আপনি কি নিশ্চিত যে <strong>"{{ report.title }}"</strong> রিপোর্টটি ডিলিট করতে চান? এটি আর ফিরে পাওয়া যাবে না।</p>
+            <h4 class="text-danger">Do you want to delete the report?</h4>
+            <p>Are you sure that you delete <strong>"{{ report.title }}"</strong> report?</p>
             <form method="POST">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-danger">হ্যাঁ, ডিলিট করুন</button>
-                <a href="{% url 'my_reports' %}" class="btn btn-secondary">না, ফিরে যাই</a>
+                <button type="submit" class="btn btn-danger">Yes, Delete Report</button>
+                <a href="{% url 'my_reports' %}" class="btn btn-secondary">No, Go Back</a>
             </form>
         </div>
     </div>

@@ -1,37 +1,63 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer-when-downgrade">
-    <title>{% block title %}CivicEye{% endblock %}</title>
+    <title>{% block title %}CivicEye - Urban Tracker{% endblock %}</title>
     
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Chart.js for Data Analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Leaflet Maps Core Assets -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Leaflet Control Geocoder for Map Search -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     
+    <!-- Link to Custom Professional CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Essential Styles to ensure Map visibility -->
     <style>
-        #mainMap { height: 400px; width: 100%; border-radius: 15px; z-index: 1; }
-        .chart-container { position: relative; height: 300px; width: 100%; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #mainMap, #pickMap {
+            height: 450px !important; /* Forces height so map is visible */
+            width: 100%;
+            border-radius: 15px;
+            z-index: 1;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
     </style>
 </head>
-<body class="bg-light">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow mb-4">
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/">CivicEye Dashboard</a>
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}">CivicEye Dashboard</a>
+            
             <div class="d-flex align-items-center">
                 {% if user.is_authenticated %}
-                    <span class="text-white me-3 d-none d-md-inline small">হ্যালো, <b>{{ user.username }}</b></span>
-                    <a href="{% url 'my_reports' %}" class="text-white me-3 text-decoration-none small">আমার রিপোর্ট</a>
-                    <a href="{% url 'report_issue' %}" class="btn btn-warning btn-sm fw-bold me-2">+ নতুন রিপোর্ট</a>
+                    <!-- Displayed for logged-in users -->
+                    <span class="text-white me-3 d-none d-md-inline small">Hello, <b>{{ user.username }}</b></span>
+                    <a href="{% url 'my_reports' %}" class="text-white me-3 text-decoration-none small">My Reports</a>
+                    <a href="{% url 'report_issue' %}" class="btn btn-warning btn-sm fw-bold me-3">+ New Report</a>
+                    
                     <form action="{% url 'logout' %}" method="post" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
                     </form>
                 {% else %}
+                    <!-- Displayed for anonymous visitors -->
                     <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm me-2">Login</a>
                     <a href="{% url 'register' %}" class="btn btn-warning btn-sm fw-bold">Sign Up</a>
                 {% endif %}
@@ -39,26 +65,35 @@
         </div>
     </nav>
 
-    <!-- Content Area -->
-    <div class="container">
+    <!-- Main Content Body -->
+    <div class="container mt-4">
+        <!-- System Messages (Alerts) -->
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-success alert-dismissible fade show">
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
         {% endif %}
 
         {% block content %}
-        <!-- অন্য পেজগুলোর কোড এখানে অটোমেটিক চলে আসবে -->
+        <!-- Page-specific content will be injected here -->
         {% endblock %}
     </div>
 
-    <footer class="text-center py-4 text-muted small">
-        &copy; 2024 CivicEye - Urban Issue Tracker Project
+    <!-- Website Footer -->
+    <footer class="text-center py-5 text-muted small">
+        <div class="container">
+            <hr>
+            <p>&copy; 2026 CivicEye | Modern Urban Issue Tracker Platform</p>
+        </div>
     </footer>
 
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Placeholder for page-specific scripts -->
     {% block extra_js %}{% endblock %}
 </body>
 </html>
